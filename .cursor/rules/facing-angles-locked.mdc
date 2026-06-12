@@ -1,0 +1,34 @@
+---
+description: KİLİTLİ — Onaylı karakter/pusula bakış açıları; kullanıcı onayı olmadan değiştirme
+alwaysApply: true
+---
+
+# Bakış Açıları KİLİTLİ (Kullanıcı Onaylı — 2026-06-07)
+
+Kullanıcı tüm yönleri test etti ve onayladı. **Açılar, flip değerleri ve grid→pusula eşlemesi kullanıcı açıkça onay vermeden değiştirilmez.**
+
+## Yasak
+
+- `MODEL_YAW_LOCKED`, `MODEL_FLIP_LOCKED` değerlerini değiştirmek
+- `_model_lookup_for_grid` / `compass_label_dir_for_grid_spoke` mantığını değiştirmek
+- `get_model_facing` / `get_model_facing_for_grid` davranışını “kalibrasyon” veya “düzeltme” adıyla değiştirmek
+- `character_view.gd`, `compass_ui.gd`, `facing_arrow_overlay.gd` içinde facing açısını bypass eden kod eklemek
+
+## Onaylı açı tablosu (tek kaynak: `habbo_iso_facing.gd`)
+
+| Yön | yaw | flip |
+|-----|-----|------|
+| K  | 225° | false |
+| KD | 180° | false |
+| D  | 135° | **true** |
+| GD |  90° | false |
+| G  |  45° | false |
+| GB |   0° | false |
+| B  | 315° | false |
+| KB | 270° | false |
+
+Grid→pusula: `compass_label_dir_for_grid_spoke(grid_i) = (grid_i + 7) % 8`
+
+## İstisna
+
+Sadece kullanıcı mesajında açıkça “açıları değiştir”, “şu yönü X derece yap” veya benzeri onay verirse düzenlenebilir.

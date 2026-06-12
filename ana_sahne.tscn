@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://oh5novttd0vo"]
+
+[ext_resource type="Script" uid="uid://cj2158n5xswx0" path="res://player.gd" id="1_15coe"]
+[ext_resource type="Script" uid="uid://dvwva71aqjceo" path="res://iso_grid.gd" id="2_grid"]
+[ext_resource type="Script" uid="uid://bii6ksoacb8r0" path="res://camera_controller.gd" id="3_cam"]
+[ext_resource type="Script" uid="uid://disvh6upbmmfe" path="res://settings_ui.gd" id="4_ui"]
+[ext_resource type="Script" uid="uid://cjtafkedjancp" path="res://block_manager.gd" id="5_blk"]
+[ext_resource type="Script" uid="uid://7qel5hf5t7g5" path="res://test_menu.gd" id="6_tmenu"]
+[ext_resource type="Script" uid="uid://qi7ue7oneoal" path="res://main.gd" id="7_main"]
+[ext_resource type="Script" uid="uid://bq5g47bs08v11" path="res://compass_ui.gd" id="8_compass"]
+[ext_resource type="Script" uid="uid://dnisir3xnre7j" path="res://facing_arrow_overlay.gd" id="9_farrow"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_32nbw"]
+size = Vector2(16, 16)
+
+[node name="Node2D" type="Node2D" unique_id=80924849]
+script = ExtResource("7_main")
+
+[node name="IsoGrid" type="Node2D" parent="." unique_id=1234567890]
+script = ExtResource("2_grid")
+
+[node name="BlockManager" type="Node2D" parent="." unique_id=555555555]
+script = ExtResource("5_blk")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1082645620]
+script = ExtResource("1_15coe")
+
+[node name="Shape" type="Polygon2D" parent="Player" unique_id=610861634]
+color = Color(0.36880672, 0.9999972, 1.540184e-06, 1)
+polygon = PackedVector2Array(0, -16, 32, 0, 0, 16, -32, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=36491892]
+shape = SubResource("RectangleShape2D_32nbw")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=333333333]
+script = ExtResource("3_cam")
+
+[node name="SettingsUI" type="CanvasLayer" parent="." unique_id=444444444]
+script = ExtResource("4_ui")
+
+[node name="TestMenu" type="CanvasLayer" parent="." unique_id=666666666]
+script = ExtResource("6_tmenu")
+
+[node name="CompassUI" type="CanvasLayer" parent="." unique_id=1285051761]
+script = ExtResource("8_compass")
+
+[node name="FacingArrowOverlay" type="Node2D" parent="." unique_id=1364974100]
+script = ExtResource("9_farrow")

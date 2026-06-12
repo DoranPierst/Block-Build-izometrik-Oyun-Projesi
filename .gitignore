@@ -1,0 +1,27 @@
+# Godot 4+ specific ignores
+.godot/
+export.cfg
+export_presets.cfg
+*.translation
+
+# System / IDE
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Build / export
+/android/
+/build/
+/bin/
+*.apk
+*.aab
+*.exe
+*.pck
+*.zip
+
+# Cursor workspace assets (screenshots)
+assets/c__Users_*/
+
+# Godot / editor temp
+*.tmp
