@@ -59,7 +59,7 @@ func _update_state() -> void:
 		_facing_dir = cv.call("get_facing_dir")
 	if _player.has_method("get_move_step"):
 		_move_step = _player.call("get_move_step")
-	_walk_dir = HabboIsoFacing.dir_from_grid_step(_move_step) \
+	_walk_dir = IsoFacing.dir_from_grid_step(_move_step) \
 		if _move_step != Vector2i.ZERO else -1
 	_update_info_label()
 
@@ -100,10 +100,10 @@ func _update_info_label() -> void:
 		_info.text = "%s\nDuruyor — %s  %s%s" % [pos_line, face, extra, warn]
 
 func _compass_name(grid_dir: int) -> String:
-	return HabboIsoFacing.grid_spoke_compass_name(grid_dir)
+	return IsoFacing.grid_spoke_compass_name(grid_dir)
 
 func _fmt_facing(dir: int) -> String:
-	var facing: Dictionary = HabboIsoFacing.get_model_facing_for_grid(dir)
+	var facing: Dictionary = IsoFacing.get_model_facing_for_grid(dir)
 	var flip_txt := " flip" if facing["flip"] else ""
 	var yaw := fmod((facing["yaw"] as float) + 360.0, 360.0)
 	return "yaw %s°%s" % [str(snapped(yaw, 0.1)), flip_txt]
@@ -240,9 +240,9 @@ class _CompassRose extends Control:
 			if i == hi:
 				col = Color(1.0, 0.92, 0.22)
 			# Etiket eski konumda; açı harfin yönüne göre (G≠grid kolu).
-			var facing := HabboIsoFacing.get_model_facing(letter_i)
+			var facing := IsoFacing.get_model_facing(letter_i)
 			_draw_label(
-				HabboIsoFacing.COMPASS_SHORT[letter_i],
+				IsoFacing.COMPASS_SHORT[letter_i],
 				pos, col, is_axis,
 				facing["yaw"] as float,
 				facing["flip"] as bool
@@ -252,12 +252,12 @@ class _CompassRose extends Control:
 		return (grid_i + 7) % 8
 
 	func _label_pos(grid_i: int, center: Vector2, R: float, axis: bool) -> Vector2:
-		var v: Vector2 = HabboIsoFacing.DIR_VECTORS[grid_i]
+		var v: Vector2 = IsoFacing.DIR_VECTORS[grid_i]
 		var ring := AXIS_LABEL_R if axis else DIAG_LABEL_R
 		return center + v * (R * ring) + LABEL_NUDGE[grid_i] + Vector2(0.0, LABEL_Y_SHIFT)
 
 	func _draw_spoke(grid_i: int, center: Vector2, R: float, hi: int, axis: bool) -> void:
-		var v: Vector2 = HabboIsoFacing.DIR_VECTORS[grid_i]
+		var v: Vector2 = IsoFacing.DIR_VECTORS[grid_i]
 		var len := R * (AXIS_SPOKE_R if axis else DIAG_SPOKE_R)
 		var col := Color(0.32, 0.90, 0.44, 0.95) if axis else Color(0.92, 0.38, 0.34, 0.82)
 		if grid_i == hi:

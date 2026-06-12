@@ -31,7 +31,7 @@ func _draw() -> void:
 		return
 
 	var dir: int = cv.call("get_facing_dir")
-	var step: Vector2i = HabboIsoFacing.grid_step(dir)
+	var step: Vector2i = IsoFacing.grid_step(dir)
 	var target: Vector2i = _player.call("get_grid_cell") + step
 
 	var center: Vector2 = _player.grid_to_world(target)
@@ -49,7 +49,7 @@ func _draw() -> void:
 	z_as_relative = false
 
 	_draw_tile_mark(center, hw, hh)
-	_draw_facing_arrow(center, HabboIsoFacing.DIR_VECTORS[dir], hw * 0.55)
+	_draw_facing_arrow(center, IsoFacing.DIR_VECTORS[dir], hw * 0.55)
 
 func _draw_tile_mark(center: Vector2, hw: float, hh: float) -> void:
 	var tile := PackedVector2Array([

@@ -1,4 +1,4 @@
-class_name HabboIsoFacing
+class_name IsoFacing
 extends RefCounted
 
 ## 8 izometrik yön — grid adımı = ekran gidiş yönü (2:1, 64×32).
@@ -59,7 +59,7 @@ static func snap_velocity(vel: Vector2) -> int:
 	return best_i
 
 static func get_facing(dir: int) -> Dictionary:
-	# 2D Habbo sprite — 4 açı + yatay ayna.
+	# 2D sprite — 4 açı + yatay ayna.
 	const YAWS: Array[float] = [90.0, 90.0, 180.0, 180.0, 0.0, 0.0, 270.0, 270.0]
 	const FLIP: Array[bool] = [false, true, false, true, false, true, false, true]
 	return {"yaw": YAWS[dir], "flip": FLIP[dir]}

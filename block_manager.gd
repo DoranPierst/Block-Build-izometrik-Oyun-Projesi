@@ -520,7 +520,7 @@ func _ctx_remove() -> void:
 	if _ctx_id < 0: return
 	_remove_block(_ctx_id)
 
-func _habbo_promote_elev(info: BlockInfo) -> int:
+func _stack_surface_elev(info: BlockInfo) -> int:
 	# Aynı hücre + boyuttaki en üst yüzey; döndürülen blok oraya terfi edebilir.
 	var best_top := -1
 	for bid in _blocks:
@@ -535,9 +535,9 @@ func _habbo_promote_elev(info: BlockInfo) -> int:
 		return best_top
 	return -1
 
-func _resolve_rotate_elevation(habbo_elev: int, place_elev: int) -> int:
-	if habbo_elev >= 0:
-		return maxi(place_elev, habbo_elev)
+func _resolve_rotate_elevation(stack_elev: int, place_elev: int) -> int:
+	if stack_elev >= 0:
+		return maxi(place_elev, stack_elev)
 	return place_elev
 
 func _rebuild_rotated_block(info: BlockInfo) -> void:
@@ -555,8 +555,8 @@ func _ctx_rotate() -> void:
 	if info == null:
 		return
 
-	# Habbo terfisi döndürmeden ÖNCE hesaplanır; erken çıkış yok — ikisi birlikte uygulanır.
-	var habbo_elev := _habbo_promote_elev(info)
+	# Yığın terfisi döndürmeden ÖNCE hesaplanır; erken çıkış yok — ikisi birlikte uygulanır.
+	var stack_elev := _stack_surface_elev(info)
 
 	# ── Duvar döndürme ────────────────────────────────────────────────────────
 	if info.wall:
@@ -566,7 +566,7 @@ func _ctx_rotate() -> void:
 		if _can_rotate_place(info, info.cell, new_size, true):
 			info.wall_face  = new_face
 			info.size       = new_size
-			info.elevation  = _resolve_rotate_elevation(habbo_elev, _pending_elev)
+			info.elevation  = _resolve_rotate_elevation(stack_elev, _pending_elev)
 			_rebuild_rotated_block(info)
 		else:
 			_occupy_block_cells(info)
@@ -577,9 +577,9 @@ func _ctx_rotate() -> void:
 	# ── Küp döndürme ──────────────────────────────────────────────────────────
 	var rot := Vector2i(info.size.y, info.size.x)
 	if rot == info.size:
-		# Boyut değişmez (1×1, 2×2 …) ama Habbo terfisi uygulanabilir.
-		if habbo_elev >= 0:
-			info.elevation = habbo_elev
+		# Boyut değişmez (1×1, 2×2 …) ama yığın terfisi uygulanabilir.
+		if stack_elev >= 0:
+			info.elevation = stack_elev
 			_rebuild_rotated_block(info)
 		_hide_ctx()
 		return
@@ -587,7 +587,7 @@ func _ctx_rotate() -> void:
 	_free_block_cells(info)
 	if _can_rotate_place(info, info.cell, rot, true):
 		info.size      = rot
-		info.elevation = _resolve_rotate_elevation(habbo_elev, _pending_elev)
+		info.elevation = _resolve_rotate_elevation(stack_elev, _pending_elev)
 		_rebuild_rotated_block(info)
 	else:
 		_occupy_block_cells(info)

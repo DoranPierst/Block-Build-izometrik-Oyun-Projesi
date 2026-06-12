@@ -1,6 +1,6 @@
 ---
 description: ProjeH izometrik 8 yön eşlemesi — karakter facing ve pathfinding
-globs: habbo_iso_facing.gd,character_view.gd,player.gd,habbo_direction_preview.gd
+globs: iso_facing.gd,character_view.gd,player.gd,iso_character_2d.gd
 alwaysApply: false
 ---
 
@@ -28,9 +28,9 @@ Referans diyagrama göre yönler **ekran uzayında** şöyle tanımlanır:
 - `world.x = (gx-gy)*32`, `world.y = (gx+gy)*16` — `player.gd` `_grid_to_world`
 - `DIR_VECTORS` ekran kartal yönü **değil**; yukarıdaki izometrik eksen/kenar eşlemesidir
 - Varsayılan spawn duruşu: **Güneydoğu** (ekran sağı, grid `(1, -1)`)
-- 3D/pusula bakış açıları **KİLİTLİ** — bkz. `facing-angles-locked.mdc` ve `habbo_iso_facing.gd` `MODEL_YAW_LOCKED`
-- Karakter: `habbo_character_2d.gd` — 2D çizim, yüz `DIR_VECTORS[dir]` yönünde
+- 3D/pusula bakış açıları **KİLİTLİ** — bkz. `facing-angles-locked.mdc` ve `iso_facing.gd` `MODEL_YAW_LOCKED`
+- Karakter: `iso_character_2d.gd` — 2D çizim, yüz `DIR_VECTORS[dir]` yönünde
 - Yön kaynağı: `player.gd` grid adımı → `dir_from_grid_step()` (adım başında anında döner)
 - Yüz her zaman adım yönüne bakar (3D yaw yok)
 
-Kaynak: `habbo_iso_facing.gd` — `GRID_STEPS`, `DIR_VECTORS`, `DEFAULT_DIR`
+Kaynak: `iso_facing.gd` — `GRID_STEPS`, `DIR_VECTORS`, `DEFAULT_DIR`

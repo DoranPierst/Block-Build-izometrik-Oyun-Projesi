@@ -21,7 +21,7 @@ InputActions="*res://input_actions.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/meshy-godot-plugin/plugin.cfg")
+enabled=PackedStringArray()
 
 [physics]
 

@@ -14,7 +14,7 @@ Kullanıcı tüm yönleri test etti ve onayladı. **Açılar, flip değerleri ve
 - `get_model_facing` / `get_model_facing_for_grid` davranışını “kalibrasyon” veya “düzeltme” adıyla değiştirmek
 - `character_view.gd`, `compass_ui.gd`, `facing_arrow_overlay.gd` içinde facing açısını bypass eden kod eklemek
 
-## Onaylı açı tablosu (tek kaynak: `habbo_iso_facing.gd`)
+## Onaylı açı tablosu (tek kaynak: `iso_facing.gd`)
 
 | Yön | yaw | flip |
 |-----|-----|------|

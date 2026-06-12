@@ -55,8 +55,7 @@ func _ready() -> void:
 	_add_character_view()
 
 func _add_character_view() -> void:
-	# Habbo karakter (varsayılan). Idle FBX yedeği:
-	# load("res://character_view.idle_backup.gd")
+	# Varsayılan 3D karakter görünümü.
 	var script = load("res://character_view.gd")
 	if script == null:
 		return

@@ -1,21 +1,20 @@
 extends Node2D
 
 ## Karakter görseli: SubViewport → Sprite2D.
-## Varsayılan model: assets/characters/roblox.blend (8 yön grid facing).
+## Varsayılan model: assets/characters/character_base.blend (8 yön grid facing).
 
-enum CharacterMode { ROBLOX, FBX, CAPSULE, HABBO_2D }
+enum CharacterMode { MODEL_3D, FBX, CAPSULE, SPRITE_2D }
 
-const ROBLOX_MODEL := "res://assets/characters/roblox.blend"
-const VOXEL_MODEL  := "res://assets/characters/Meshy_AI_voxel_base_mesh_karak_0608092123_texture.fbx"
+const DEFAULT_MODEL := "res://assets/characters/character_base.blend"
 
-@export var character_mode: CharacterMode = CharacterMode.ROBLOX
+@export var character_mode: CharacterMode = CharacterMode.MODEL_3D
 
 @export var cam_ortho_size: float    = 1.7
 @export var vp_size:        Vector2i = Vector2i(96, 128)
 @export_range(1, 4, 1) var render_scale: int = 3
 @export var ground_offset:  Vector2  = Vector2.ZERO
 
-@export var model_path: String = ROBLOX_MODEL
+@export var model_path: String = DEFAULT_MODEL
 @export var model_correction_rotation: Vector3 = Vector3.ZERO
 @export var model_facing_offset_deg: float = 90.0
 @export var model_extra_scale:    float   = 1.0
@@ -31,16 +30,11 @@ const VOXEL_MODEL  := "res://assets/characters/Meshy_AI_voxel_base_mesh_karak_06
 
 ## 2 birim yükseklik ≈ 1.1 world birimi (izometrik kamera).
 const TARGET_HEIGHT := 1.1
-const MODEL_FALLBACKS: Array[String] = [
-	ROBLOX_MODEL,
-	VOXEL_MODEL,
-]
-
 var _vp:           SubViewport
 var _sprite:       Sprite2D
 var _root:         Node3D
 var _model_body:   Node3D
-var _current_dir:  int = HabboIsoFacing.DEFAULT_DIR
+var _current_dir:  int = IsoFacing.DEFAULT_DIR
 var _walk_phase:   float = 0.0
 var _is_moving:    bool  = false
 var _facing_badge: Label
@@ -49,7 +43,7 @@ var _show_facing_badge: bool = false
 func _ready() -> void:
 	add_to_group("character_view")
 	match character_mode:
-		CharacterMode.ROBLOX, CharacterMode.FBX:
+		CharacterMode.MODEL_3D, CharacterMode.FBX:
 			set_process(true)
 			_build_viewport()
 			_load_model_when_ready()
@@ -59,11 +53,11 @@ func _ready() -> void:
 			_build_capsule_character()
 			_align_sprite_to_feet()
 			_build_facing_badge()
-			_apply_facing_dir(HabboIsoFacing.DEFAULT_DIR)
-		CharacterMode.HABBO_2D:
+			_apply_facing_dir(IsoFacing.DEFAULT_DIR)
+		CharacterMode.SPRITE_2D:
 			set_process(true)
 			_build_facing_badge()
-			_apply_facing_dir(HabboIsoFacing.DEFAULT_DIR)
+			_apply_facing_dir(IsoFacing.DEFAULT_DIR)
 
 func _process(delta: float) -> void:
 	if _is_moving:
@@ -71,7 +65,7 @@ func _process(delta: float) -> void:
 	else:
 		_walk_phase = 0.0
 
-	if character_mode == CharacterMode.HABBO_2D:
+	if character_mode == CharacterMode.SPRITE_2D:
 		queue_redraw()
 		return
 
@@ -81,16 +75,16 @@ func _process(delta: float) -> void:
 	_model_body.position.y = bob
 
 func _draw() -> void:
-	if character_mode != CharacterMode.HABBO_2D:
+	if character_mode != CharacterMode.SPRITE_2D:
 		return
-	var colors := HabboCharacter2D.Colors.new()
+	var colors := IsoCharacter2D.Colors.new()
 	colors.skin  = skin_color
 	colors.hair  = hair_color
 	colors.shirt = shirt_color
 	colors.pants = pants_color
 	colors.shoes = shoes_color
 	var phase := _walk_phase if _is_moving else 0.0
-	HabboCharacter2D.draw_character(self, _current_dir, phase, colors, ground_offset)
+	IsoCharacter2D.draw_character(self, _current_dir, phase, colors, ground_offset)
 
 func _load_model_when_ready() -> void:
 	await get_tree().process_frame
@@ -102,7 +96,7 @@ func _load_model_when_ready() -> void:
 	_build_capsule_character()
 	_align_sprite_to_feet()
 	_build_facing_badge()
-	_apply_facing_dir(HabboIsoFacing.DEFAULT_DIR)
+	_apply_facing_dir(IsoFacing.DEFAULT_DIR)
 
 func _build_viewport() -> void:
 	var scale_i := maxi(render_scale, 1)
@@ -180,16 +174,11 @@ func _create_character_root() -> void:
 	_vp.add_child(_root)
 
 func _try_load_models() -> bool:
-	var paths: Array[String] = []
-	if not model_path.is_empty():
-		paths.append(model_path)
-	for fb in MODEL_FALLBACKS:
-		if fb not in paths:
-			paths.append(fb)
-	for path in paths:
-		if await _load_single_model(path):
-			print("CharacterView: model yüklendi → ", path)
-			return true
+	if model_path.is_empty():
+		return false
+	if await _load_single_model(model_path):
+		print("CharacterView: model yüklendi → ", model_path)
+		return true
 	return false
 
 func _cleanup_failed_model_load() -> void:
@@ -232,7 +221,7 @@ func _load_single_model(path: String) -> bool:
 	await _deferred_fit(pivot, content, path)
 
 	_build_facing_badge()
-	_apply_facing_dir(HabboIsoFacing.DEFAULT_DIR)
+	_apply_facing_dir(IsoFacing.DEFAULT_DIR)
 	return true
 
 func _deferred_fit(pivot: Node3D, content: Node3D, path: String) -> void:
@@ -324,8 +313,8 @@ func _build_facing_badge() -> void:
 	_facing_badge.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
 	_facing_badge.custom_minimum_size  = Vector2(52, 24)
 	var head_y := -float(vp_size.y) * 0.5 + ground_offset.y - float(vp_size.y) * 0.34
-	if character_mode == CharacterMode.HABBO_2D:
-		head_y = ground_offset.y - HabboCharacter2D.CHAR_H + 6.0
+	if character_mode == CharacterMode.SPRITE_2D:
+		head_y = ground_offset.y - IsoCharacter2D.CHAR_H + 6.0
 	_facing_badge.position = Vector2(-28.0, head_y)
 	_facing_badge.add_theme_font_size_override("font_size", 20)
 	_facing_badge.add_theme_color_override("font_color", Color(1.0, 0.98, 0.35))
@@ -339,21 +328,21 @@ func _build_facing_badge() -> void:
 func _apply_facing_dir(dir: int) -> void:
 	_current_dir = dir
 	if _model_body:
-		if character_mode == CharacterMode.HABBO_2D:
-			var facing_2d: Dictionary = HabboIsoFacing.get_facing(dir)
+		if character_mode == CharacterMode.SPRITE_2D:
+			var facing_2d: Dictionary = IsoFacing.get_facing(dir)
 			_model_body.rotation_degrees.y = facing_2d["yaw"] + model_facing_offset_deg
 			_model_body.scale.x = 1.0
 		else:
-			var facing_3d: Dictionary = HabboIsoFacing.get_model_facing_for_grid(
+			var facing_3d: Dictionary = IsoFacing.get_model_facing_for_grid(
 				dir, model_facing_offset_deg)
 			_model_body.scale = Vector3.ONE
 			_model_body.rotation_degrees.y = facing_3d["yaw"]
 			if facing_3d["flip"]:
 				_model_body.scale.x = -1.0
-	var facing_badge: Dictionary = HabboIsoFacing.get_facing(dir)
+	var facing_badge: Dictionary = IsoFacing.get_facing(dir)
 	if _sprite:
-		_sprite.flip_h = facing_badge["flip"] if character_mode == CharacterMode.HABBO_2D else false
-	if character_mode == CharacterMode.HABBO_2D:
+		_sprite.flip_h = facing_badge["flip"] if character_mode == CharacterMode.SPRITE_2D else false
+	if character_mode == CharacterMode.SPRITE_2D:
 		queue_redraw()
 	_update_facing_badge()
 
@@ -362,7 +351,7 @@ func _update_facing_badge() -> void:
 		return
 	_facing_badge.visible = _show_facing_badge
 	if _show_facing_badge:
-		_facing_badge.text = HabboIsoFacing.grid_spoke_compass_short(_current_dir)
+		_facing_badge.text = IsoFacing.grid_spoke_compass_short(_current_dir)
 
 func set_facing_badge_enabled(on: bool) -> void:
 	_show_facing_badge = on
@@ -375,7 +364,7 @@ func set_moving(on: bool) -> void:
 	_is_moving = on
 	if not on:
 		_walk_phase = 0.0
-	if character_mode == CharacterMode.HABBO_2D:
+	if character_mode == CharacterMode.SPRITE_2D:
 		queue_redraw()
 
 func _build_capsule_character() -> void:
@@ -410,7 +399,7 @@ func set_facing(vel: Vector2) -> void:
 	_is_moving = vel.length_squared() >= 0.5
 	if not _is_moving:
 		return
-	_apply_facing_dir(HabboIsoFacing.snap_velocity(vel))
+	_apply_facing_dir(IsoFacing.snap_velocity(vel))
 
 func get_facing_dir() -> int:
 	return _current_dir
@@ -419,4 +408,4 @@ func set_facing_grid_step(step: Vector2i) -> void:
 	if step == Vector2i.ZERO:
 		return
 	_is_moving = true
-	_apply_facing_dir(HabboIsoFacing.dir_from_grid_step(step))
+	_apply_facing_dir(IsoFacing.dir_from_grid_step(step))

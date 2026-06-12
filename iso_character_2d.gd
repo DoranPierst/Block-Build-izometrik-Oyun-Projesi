@@ -1,7 +1,7 @@
-class_name HabboCharacter2D
+class_name IsoCharacter2D
 extends RefCounted
 
-## Habbo tarzı blok karakter — 2 birim (64px), 8 yön, yüz gidiş yönüne.
+## İzometrik blok karakter — 2 birim (64px), 8 yön, yüz gidiş yönüne.
 
 const CHAR_H := 64.0
 
@@ -54,7 +54,7 @@ static func draw_character(
 	_draw_arm(canvas, chest_y, neck_y, v, side, 1, step * 0.55, colors)
 
 static func _dir_vec(dir: int) -> Vector2:
-	var raw: Vector2 = HabboIsoFacing.DIR_VECTORS[dir]
+	var raw: Vector2 = IsoFacing.DIR_VECTORS[dir]
 	if raw.length_squared() < 0.001:
 		return Vector2(0.0, 1.0)
 	return raw.normalized()
